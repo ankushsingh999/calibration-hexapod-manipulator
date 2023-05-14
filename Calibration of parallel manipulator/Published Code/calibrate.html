@@ -1,0 +1,201 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>calibrate</title><meta name="generator" content="MATLAB 9.12"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2022-10-13"><meta name="DC.source" content="calibrate.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><h1></h1><!--introduction--><!--/introduction--><h2>Contents</h2><div><ul><li><a href="#3">Initial Guess</a></li><li><a href="#4">Minimization of Cost Function</a></li><li><a href="#5">Given Real and Nominal Values</a></li><li><a href="#6">Bar graph for the values obtained</a></li></ul></div><p><b>RBE 521- Legged Robotics - Midterm - Fall 2022</b></p><p><b>Calibration of a Hexapod Table by simulation</b></p><pre class="codeinput"><span class="keyword">function</span> calibrate
+</pre><h2 id="3">Initial Guess</h2><p>%% The initialguess are the nominal values given in the table</p><pre class="codeinput">Initialguess = [92.1597 84.4488 0 305.4001 111.1565 0 604.8652;
+       27.055 122.037 0 -56.4357 320.0625 0 604.8652;
+      -119.2146 37.5882 0 -248.9644 208.9060 0 604.8652;
+      -119.2146 -37.5882 0 -248.9644 -208.9060 0 604.8652;
+       27.055 -122.037 0 -56.4357 -320.0625 0 604.8652;
+       92.1597 -84.4488 0 305.4001 -111.1565 0 604.8652;]';
+</pre><h2 id="4">Minimization of Cost Function</h2><p>lsqnonlin is used to minimize the cost function by taking the initial guess and predicting the kinematic parameters</p><pre class="codeinput">IdentifiedValues = lsqnonlin(@CF , Initialguess)'
+</pre><pre class="codeoutput">
+Local minimum possible.
+
+lsqnonlin stopped because the final change in the sum of squares relative to 
+its initial value is less than the value of the function tolerance.
+
+
+IdentifiedValues =
+
+   96.6611   81.7606    1.0684  305.2600  115.0700    2.6210  604.4299
+   22.2475  125.2510   -0.5530  -55.2815  322.9818    4.2181  607.2473
+ -122.4645   36.6422    4.3538 -244.8080  208.0058    3.9348  600.4438
+ -120.6838  -34.4564   -4.9010 -252.5734 -211.8781   -3.0122  605.9031
+   24.7768 -125.0488   -4.8473  -53.9679 -320.6115    4.3181  604.5251
+   91.3449  -80.9842    0.2519  302.4251 -109.4326    3.3816  600.0615
+
+</pre><h2 id="5">Given Real and Nominal Values</h2><p>Declaring the real and nominal values for comparision</p><pre class="codeinput"><span class="comment">%simulated real kinematic parameters</span>
+real_values  = [96.6610 81.7602 1.0684 305.2599 115.0695 2.6210 604.4299;
+       22.2476 125.2511 -0.5530 -55.2814 322.9819 4.2181 607.2473;
+      -122.4519 36.6453 4.3547 -244.7954 208.0087 3.9365 600.4441;
+      -120.6859 -34.4565 -4.9014 -252.5755 -211.8783 -3.0128 605.9031;
+       24.7769 -125.0489 -4.8473 -53.9678 -320.6115 4.3181 604.5251;
+       91.3462 -80.9866 0.2515 302.4266 -109.4351 3.3812 600.0616;]
+<span class="comment">%nominal kinematic parameters</span>
+nominal_values = [92.1597 84.4488 0 305.4001 111.1565 0 604.8652;
+       27.055 122.037 0 -56.4357 320.0625 0 604.8652;
+      -119.2146 37.5882 0 -248.9644 208.9060 0 604.8652;
+      -119.2146 -37.5882 0 -248.9644 -208.9060 0 604.8652;
+       27.055 -122.037 0 -56.4357 -320.0625 0 604.8652;
+       92.1597 -84.4488 0 305.4001 -111.1565 0 604.8652;];
+</pre><pre class="codeoutput">
+real_values =
+
+   96.6610   81.7602    1.0684  305.2599  115.0695    2.6210  604.4299
+   22.2476  125.2511   -0.5530  -55.2814  322.9819    4.2181  607.2473
+ -122.4519   36.6453    4.3547 -244.7954  208.0087    3.9365  600.4441
+ -120.6859  -34.4565   -4.9014 -252.5755 -211.8783   -3.0128  605.9031
+   24.7769 -125.0489   -4.8473  -53.9678 -320.6115    4.3181  604.5251
+   91.3462  -80.9866    0.2515  302.4266 -109.4351    3.3812  600.0616
+
+</pre><h2 id="6">Bar graph for the values obtained</h2><pre class="codeinput">error_real_nominal = real_values-nominal_values
+error_values = real_values - IdentifiedValues
+figure
+graphs = [abs(reshape(error_values,[],1)),abs(reshape(error_real_nominal,[],1))];
+bar3(graphs);
+title(<span class="string">'IDENTIFIED ERRORS IN KINEMATIC PARAMETERS'</span>)
+zlabel(<span class="string">'Error(mm)'</span>)
+ylabel(<span class="string">'Kinematic Parameters'</span>)
+legend({<span class="string">'before calibration'</span>,<span class="string">'after calibration'</span>},<span class="string">'Location'</span>,<span class="string">'northeast'</span>)
+</pre><pre class="codeoutput">
+error_real_nominal =
+
+    4.5013   -2.6886    1.0684   -0.1402    3.9130    2.6210   -0.4353
+   -4.8074    3.2141   -0.5530    1.1543    2.9194    4.2181    2.3821
+   -3.2373   -0.9429    4.3547    4.1690   -0.8973    3.9365   -4.4211
+   -1.4713    3.1317   -4.9014   -3.6111   -2.9723   -3.0128    1.0379
+   -2.2781   -3.0119   -4.8473    2.4679   -0.5490    4.3181   -0.3401
+   -0.8135    3.4622    0.2515   -2.9735    1.7214    3.3812   -4.8036
+
+
+error_values =
+
+   -0.0001   -0.0004    0.0000   -0.0001   -0.0005    0.0000   -0.0000
+    0.0001    0.0001   -0.0000    0.0001    0.0001   -0.0000    0.0000
+    0.0126    0.0031    0.0009    0.0126    0.0029    0.0017    0.0003
+   -0.0021   -0.0001   -0.0004   -0.0021   -0.0002   -0.0006    0.0000
+    0.0001   -0.0001    0.0000    0.0001   -0.0000    0.0000   -0.0000
+    0.0013   -0.0024   -0.0004    0.0015   -0.0025   -0.0004    0.0001
+
+</pre><img vspace="5" hspace="5" src="calibrate_01.png" alt=""> <pre class="codeinput"><span class="keyword">end</span>
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2022a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+
+%%
+% *RBE 521- Legged Robotics - Midterm - Fall 2022* 
+%%
+% *Calibration of a Hexapod Table by simulation* 
+
+
+function calibrate 
+%% Initial Guess
+% %% The initialguess are the nominal values given in the table 
+Initialguess = [92.1597 84.4488 0 305.4001 111.1565 0 604.8652;
+       27.055 122.037 0 -56.4357 320.0625 0 604.8652;
+      -119.2146 37.5882 0 -248.9644 208.9060 0 604.8652;
+      -119.2146 -37.5882 0 -248.9644 -208.9060 0 604.8652;
+       27.055 -122.037 0 -56.4357 -320.0625 0 604.8652;
+       92.1597 -84.4488 0 305.4001 -111.1565 0 604.8652;]';
+%% Minimization of Cost Function 
+% lsqnonlin is used to minimize the cost function by taking the initial
+% guess and predicting the kinematic parameters
+IdentifiedValues = lsqnonlin(@CF , Initialguess)'
+
+%% Given Real and Nominal Values
+% Declaring the real and nominal values for comparision 
+
+%simulated real kinematic parameters
+real_values  = [96.6610 81.7602 1.0684 305.2599 115.0695 2.6210 604.4299;
+       22.2476 125.2511 -0.5530 -55.2814 322.9819 4.2181 607.2473;
+      -122.4519 36.6453 4.3547 -244.7954 208.0087 3.9365 600.4441;
+      -120.6859 -34.4565 -4.9014 -252.5755 -211.8783 -3.0128 605.9031;
+       24.7769 -125.0489 -4.8473 -53.9678 -320.6115 4.3181 604.5251;
+       91.3462 -80.9866 0.2515 302.4266 -109.4351 3.3812 600.0616;]
+%nominal kinematic parameters
+nominal_values = [92.1597 84.4488 0 305.4001 111.1565 0 604.8652;
+       27.055 122.037 0 -56.4357 320.0625 0 604.8652;
+      -119.2146 37.5882 0 -248.9644 208.9060 0 604.8652;
+      -119.2146 -37.5882 0 -248.9644 -208.9060 0 604.8652;
+       27.055 -122.037 0 -56.4357 -320.0625 0 604.8652;
+       92.1597 -84.4488 0 305.4001 -111.1565 0 604.8652;];
+
+%% Bar graph for the values obtained 
+error_real_nominal = real_values-nominal_values
+error_values = real_values - IdentifiedValues
+figure
+graphs = [abs(reshape(error_values,[],1)),abs(reshape(error_real_nominal,[],1))];
+bar3(graphs);
+title('IDENTIFIED ERRORS IN KINEMATIC PARAMETERS')
+zlabel('Error(mm)') 
+ylabel('Kinematic Parameters') 
+legend({'before calibration','after calibration'},'Location','northeast')
+end
+##### SOURCE END #####
+--></body></html>
