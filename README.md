@@ -91,8 +91,7 @@ The error when compared with the real simulated values was:
 
 ***The following is the bar graph obtained from the error:***
 
-![image](https://github.com/ankushsingh999/calibration-hexapod-manipulator/assets/64325043/061b40a2-3a66-46b2-99ef-c00478e31eb6)
-
+![image](https://github.com/ankushsingh999/calibration-hexapod-manipulator/assets/64325043/510c8a4a-c8e5-4363-9c43-59a5c9a94ccc)
 
 # Reference
 A total solution to kinematic calibration of hexapod machine tools with a minimum number of measurement configurations and superior accuracies M.J. Nategh a, M.M. Agheli b
